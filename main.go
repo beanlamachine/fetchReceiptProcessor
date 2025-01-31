@@ -63,9 +63,23 @@ func processReceipts(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"id": newReceiptWithID.id})
 }
+
+func getPointsByID(c *gin.Context) {
+	id := c.Param("id")
+
+	for _, a := range processedReceipts {
+		if a.id == id {
+			c.IndentedJSON(http.StatusOK, a.points)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "receipt not found"})
+}
+
 func main() {
 	router := gin.Default()
 	router.POST("/receipts/process", processReceipts)
+	router.GET("/receipts/:id/points", getPointsByID)
 
 	router.Run("localhost:8080")
 }
