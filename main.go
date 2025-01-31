@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -69,7 +70,7 @@ func getPointsByID(c *gin.Context) {
 
 	for _, a := range processedReceipts {
 		if a.id == id {
-			c.IndentedJSON(http.StatusOK, a.points)
+			c.IndentedJSON(http.StatusOK, gin.H{"points": a.points})
 			return
 		}
 	}
@@ -110,11 +111,13 @@ func countAlphanumericCharacters(s string) int {
 }
 
 func checkRoundDollarAmount(total string) int {
-	var dollarAmount float64
-	if _, err := fmt.Sscanf(total, "%f", &dollarAmount); err == nil {
-		if dollarAmount == math.Floor(dollarAmount) {
-			return 10
-		}
+	// Convert the string to a float
+	amount, err := strconv.ParseFloat(total, 64)
+	if err != nil {
+		return 0
+	}
+	if amount == math.Floor(amount) {
+		return 50
 	}
 	return 0
 }
